@@ -28,6 +28,10 @@ public class FileBytes {
 	public byte[] getValues() {
 		return values;
 	}
+
+    public int getBufSize() {
+        return values.length;
+    }
 	
 	public void setOffset(int offset) {
 		this.offset = offset;
