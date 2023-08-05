@@ -2,6 +2,7 @@ package io.github.tbmeans.hexedit;
 import io.github.tbmeans.filebytes.*;
 import java.util.Scanner;
 import java.util.NoSuchElementException;
+import java.util.InputMismatchException;
 import java.util.ArrayList;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -14,9 +15,6 @@ public class HexEditApp {
             return;
         }
         final String MENU_ERR = "Please enter valid menu option.";
-        final String XTOKEN = "q";
-        final String DELIM1 = " - ";
-        final String XNAME = "Quit";
         final String[] MENU = {
             "O - select Offset of first byte in a block",
             "L - set Length of block (1 minimum)",
@@ -25,12 +23,12 @@ public class HexEditApp {
             "U - Undo pending changes to byte/block at selected offset",
             "W - make copy of original and overWrite it with " +
                     "new values entered",
-            XTOKEN.toUpperCase() + DELIM1 + XNAME
+            "Q - Quit"
         };
-        final String ASK4LEN = "Enter the amount of bytes.";
-        final String ASK4POS = "Enter the offset in file.";
-        final String ASK4DAT = "Enter byte values, space-sep, " +
-                "without radix specifier.";
+        final String ASK4LEN = "Enter the amount of bytes";
+        final String ASK4POS = "Enter the offset in file";
+        final String HEXOPT = ", use prefix 0x for hexidecimal value.";
+        final String ASK4DAT = "Enter byte values, space-sep, without 0x.";
         final String BYTEONLY = "All values must be 0 to 255--try again.";
         final String NONE2DO = "No such changes to file have been defined.";
         Scanner sc = new Scanner(System.in);
@@ -51,10 +49,10 @@ public class HexEditApp {
             }
             switch (sel.toLowerCase()) {            
                 case "l":
-                    len = takeInt(ASK4LEN, sc);
+                    len = takeInt(ASK4LEN + HEXOPT, sc);
                     break;
                 case "o":
-                    offset = takeInt(ASK4POS, sc);
+                    offset = takeInt(ASK4POS + HEXOPT, sc);
                     break;
                 case "p":
                     printBytes(offset, len, args[0]);
@@ -73,32 +71,7 @@ public class HexEditApp {
                 case "v":
                     sc.nextLine();
                     String[] tokens = takeBytes(ASK4DAT, sc).split(" +");
-                    ArrayList<Byte> bytes = new ArrayList<>();
-                    boolean is3plusChars = false;
-                    Byte byteObj = Byte.valueOf("0", 16);
-                    for (int i = 0; i < tokens.length; i++) {
-                        if (tokens[i].length() > 2) {
-                            is3plusChars = true;
-                            break;
-                        }
-                        try {
-                            byteObj = Byte.decode("0x" + tokens[i]);
-                        } catch (NumberFormatException e) {
-                            byteObj = Byte.valueOf(String.valueOf(
-                                    Integer.parseInt(tokens[i], 16) - 256));
-                        } finally {
-                            bytes.add(byteObj);
-                        }
-                    }
-                    if (is3plusChars) {
-                        System.out.println(BYTEONLY);
-                        break;
-                    }
-                    byte[] buf = new byte[len];
-                    for (int i = 0; i < len; i++) {
-                        buf[i] = bytes.get(i).byteValue();
-                    }
-                    edits.add(new FileBytes(offset, buf));
+                    fillBytes(tokens, edits, offset, len, BYTEONLY);
                     break;
                 case "w":
                     if (edits.size() == 0) {
@@ -107,12 +80,12 @@ public class HexEditApp {
                         writeBytes(args[0], edits);
                     }
                     break;
-                case XTOKEN:
+                case "q":
                     break;
                 default:
                     System.out.println(MENU_ERR);
             }
-            if (sel.equals(XTOKEN)) {
+            if (sel.toLowerCase().equals("q")) {
                 break;
             }
         }
@@ -121,10 +94,23 @@ public class HexEditApp {
     }
 
     private static int takeInt(String prompt, Scanner sc) {
+        String x = "0x0";
         int n = 0;
         System.out.println(prompt);
         try {
             n = sc.nextInt();
+            System.out.println();
+        } catch (InputMismatchException e) {
+            x = sc.next();
+            if (x.length() > 0 && x.substring(0, 2).equals("0x")) {
+                try {
+                    n = Integer.parseUnsignedInt(x.substring(2), 16);
+                } catch (NumberFormatException err) {
+                    System.out.println(err.getMessage());
+                }
+            } else {
+                System.err.println(e.getMessage());
+            }
             System.out.println();
         } catch (NoSuchElementException e) {
             System.err.println(e.getMessage());
@@ -142,6 +128,39 @@ public class HexEditApp {
             System.err.println(e.getMessage());
         }
         return str;
+    }
+
+    private static void fillBytes(String[] tokens, ArrayList<FileBytes> edits,
+            int blockOffset, int blockLength, String sizeWarn) {
+        ArrayList<Byte> bytes = new ArrayList<>();
+        boolean is3plusChars = false;
+        Byte byteObj = Byte.valueOf("0", 16);
+        byte[] buf;
+
+        for (int i = 0; i < tokens.length; i++) {
+            if (tokens[i].length() > 2) {
+                is3plusChars = true;
+                break;
+            }
+            try {
+                byteObj = Byte.decode("0x" + tokens[i]);
+            } catch (NumberFormatException e) {
+                byteObj = Byte.valueOf(String.valueOf(
+                        Integer.parseInt(tokens[i], 16) - 256));
+            } finally {
+                bytes.add(byteObj);
+            }
+        }
+        if (is3plusChars) {
+            System.out.println(sizeWarn);
+            return;
+        }
+        buf = new byte[blockLength];
+        for (int i = 0; i < blockLength; i++) {
+            buf[i] = bytes.get(i).byteValue();
+        }
+        edits.add(new FileBytes(blockOffset, buf));
+        return;
     }
 
     private static void printBytes(int pos, int len, String fname) {
@@ -204,6 +223,18 @@ public class HexEditApp {
 }
 
 /*
+ * > cd ~/src/io/github/tbmeans
  * > javac -d '.\out' -cp 'C:\Users\tbmea\src' '.\hexedit\HexEditApp.java'
- * > java -cp '.\out' io.github.tbmeans.hexedit.HexEditApp .\myfile
+ * > # how to run the class directly
+ * > # java -cp '.\out' io.github.tbmeans.hexedit.HexEditApp .\myfile
+ * > # but why not make an executable jar instead
+ * > cd out
+ * > # write a text file as a manifest addition, all it needs to say is 
+ * > # Main-Class: io.github.tbmeans.hexedit.HexEditApp
+ * > # with a newline after it, and place the text file in 
+ * > # with the compiled class in out/io/github/tbmeans/hexedit
+ * > jar 0cfmv xeditor.jar ./io/github/tbmeans/hexedit/hexeditappismain ./io/github/tbmeans/hexedit/HexEditApp.class
+ * Harvest the jar from out, where ever you decide to keep it, cd to that dir and
+ * copy the file you want to work on there with it and enter
+ * > java -jar xeditor.jar .\fileToWorkOn
  */
