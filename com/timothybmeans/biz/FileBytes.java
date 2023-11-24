@@ -1,4 +1,4 @@
-package io.github.tbmeans.filebytes;
+package com.timothybmeans.biz;
 
 public class FileBytes {
     private int offset;
