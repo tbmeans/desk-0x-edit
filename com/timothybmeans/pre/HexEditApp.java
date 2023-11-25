@@ -35,17 +35,11 @@
 
 package com.timothybmeans.pre;
 
-import java.awt.event.KeyEvent;
-
 import javax.swing.*;
+import java.awt.Color;
+import java.awt.Font;
 
 public class HexEditApp {
-    /**
-     * Create the GUI and show it.  For thread safety,
-     * this method should be invoked from the
-     * event-dispatching thread.
-     */
-
     final private static String TITLE = "Hex Editor";
     final private static String MENUS = "File,Edit,View,About";
     final private static int MENULEN = itemCount(MENUS);
@@ -63,10 +57,16 @@ public class HexEditApp {
     final private static int COLCOUNT = 17;
     final private static int INIROWCT = 16;
 
+    /**
+     * Create the GUI and show it.  For thread safety,
+     * this method should be invoked from the
+     * event-dispatching thread.
+     */
     private static void createAndShowGUI() {
         //Create and set up the window.
         JFrame frame = new JFrame(TITLE);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
 
         JMenuBar menuBar = new JMenuBar();
         JMenu menu;
@@ -100,6 +100,11 @@ public class HexEditApp {
 
         JTable tableView = new JTable(defaultBytes, nibbleHeads);
         JScrollPane bytePane = new JScrollPane(tableView);
+        tableView.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
+        tableView.setFillsViewportHeight(true);
+        tableView.setShowGrid(false);
+        tableView.setShowHorizontalLines(false);
+        tableView.setShowVerticalLines(false);
         frame.getContentPane().add(bytePane);
 
         //Display the window.
