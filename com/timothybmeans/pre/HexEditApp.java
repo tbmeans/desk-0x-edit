@@ -35,6 +35,8 @@
 
 package com.timothybmeans.pre;
 
+import java.awt.event.KeyEvent;
+
 import javax.swing.*;
 
 public class HexEditApp {
@@ -43,13 +45,39 @@ public class HexEditApp {
      * this method should be invoked from the
      * event-dispatching thread.
      */
+
+    final private static String TITLE = "Hex Editor";
+    final private static String MENUS = "File,Edit,View,About";
+    final private static int MENULEN = itemCount(MENUS);
+    final private static int SUBCOUNT = MENULEN - 1;
+    final private static String ITEMS1 = "New,Open,Save,Save As,Close,Exit";
+    final private static int LEN1 = itemCount(ITEMS1);
+    final private static String ITEMS2 = "by Byte,by Code" +
+            ",Find,Find Again" + ",Replace,Goto,Select" + 
+                    ",Copy,Paste Write,Paste Insert,Preferences";
+    final private static int LEN2 = itemCount(ITEMS2);
+    final private static String ITEMS3 = "Zoom In,Zoom Out,Encoding";
+    final private static int LEN3 = itemCount(ITEMS3);
+    private static String[] ITEMS = { ITEMS1, ITEMS2, ITEMS3 };
+    private static int[] LENGTHS = { LEN1, LEN2, LEN3 };
+
     private static void createAndShowGUI() {
         //Create and set up the window.
         JFrame frame = new JFrame("Hex Editor");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        JLabel label = new JLabel("00");
-        frame.getContentPane().add(label);
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menu;
+
+        for (int i = 0; i < SUBCOUNT; i++) {
+            menu = new JMenu(itemPick(MENUS, i));
+            menuBar.add(menu);
+            for (int j = 0; j < LENGTHS[i]; j++) {
+                menu.add(new JMenuItem(itemPick(ITEMS[i], j)));
+            }
+        }
+
+        frame.setJMenuBar(menuBar);
 
         //Display the window.
         frame.pack();
@@ -64,5 +92,13 @@ public class HexEditApp {
                 createAndShowGUI();
             }
         });
+    }
+
+    public static int itemCount(String csv) {
+        return csv.split(",").length;
+    }
+
+    public static String itemPick(String csv, int index) {
+        return csv.split(",")[index];
     }
 }
