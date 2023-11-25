@@ -60,10 +60,12 @@ public class HexEditApp {
     final private static int LEN3 = itemCount(ITEMS3);
     private static String[] ITEMS = { ITEMS1, ITEMS2, ITEMS3 };
     private static int[] LENGTHS = { LEN1, LEN2, LEN3 };
+    final private static int COLCOUNT = 17;
+    final private static int INIROWCT = 16;
 
     private static void createAndShowGUI() {
         //Create and set up the window.
-        JFrame frame = new JFrame("Hex Editor");
+        JFrame frame = new JFrame(TITLE);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JMenuBar menuBar = new JMenuBar();
@@ -78,6 +80,27 @@ public class HexEditApp {
         }
 
         frame.setJMenuBar(menuBar);
+
+        String[][] defaultBytes = new String[INIROWCT][COLCOUNT];
+        String[] nibbleHeads = new String[COLCOUNT];
+
+        for (int i = 0; i < COLCOUNT; i++) {
+            if (i == 0) {
+                nibbleHeads[0] = "";
+            } else {
+                nibbleHeads[i] = xPadAndCap(i - 1);
+            }
+        }
+
+        for (int i = 0; i < INIROWCT; i++) {
+            for (int j = 0; j < COLCOUNT; j++) {
+                defaultBytes[i][j] = j == 0 ? xPadAndCap(i) + "0" : "00";
+            }
+        }
+
+        JTable tableView = new JTable(defaultBytes, nibbleHeads);
+        JScrollPane bytePane = new JScrollPane(tableView);
+        frame.getContentPane().add(bytePane);
 
         //Display the window.
         frame.pack();
@@ -100,5 +123,9 @@ public class HexEditApp {
 
     public static String itemPick(String csv, int index) {
         return csv.split(",")[index];
+    }
+
+    public static String xPadAndCap(int i) {
+        return (i < 16 ? "0" : "") + Integer.toString(i, 16).toUpperCase();
     }
 }
