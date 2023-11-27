@@ -64,15 +64,14 @@ public class HexEditApp {
 
         frame.setJMenuBar(menuBar);
 
-        JEditorPane bytesView = new JEditorPane(
-                "text/html", MyTemplates.initXedBytes());
+        JEditorPane bytesView = new JEditorPane("text/html", BYTETEMP);
         JScrollPane bytesPane = new JScrollPane(bytesView);
         JEditorPane codesView;
         JScrollPane codesPane;
         bytesView.setEditable(false);
         frame.add(bytesPane);
 
-        
+
         //Display the window.
         frame.pack();
         frame.setVisible(true);
