@@ -29,33 +29,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
 
-/*
- * Based on https://docs.oracle.com/javase/tutorial/uiswing/examples/start/HelloWorldSwingProject/src/start/HelloWorldSwing.java
- */
-
 package com.timothybmeans.pre;
 
 import javax.swing.*;
-import java.awt.Color;
-import java.awt.Font;
 
 public class HexEditApp {
-    final private static String TITLE = "Hex Editor";
-    final private static String MENUS = "File,Edit,View,About";
-    final private static int MENULEN = itemCount(MENUS);
-    final private static int SUBCOUNT = MENULEN - 1;
-    final private static String ITEMS1 = "New,Open,Save,Save As,Close,Exit";
-    final private static int LEN1 = itemCount(ITEMS1);
-    final private static String ITEMS2 = "by Byte,by Code" +
-            ",Find,Find Again" + ",Replace,Goto,Select" + 
-                    ",Copy,Paste Write,Paste Insert,Preferences";
-    final private static int LEN2 = itemCount(ITEMS2);
-    final private static String ITEMS3 = "Zoom In,Zoom Out,Encoding";
-    final private static int LEN3 = itemCount(ITEMS3);
-    private static String[] ITEMS = { ITEMS1, ITEMS2, ITEMS3 };
-    private static int[] LENGTHS = { LEN1, LEN2, LEN3 };
-    final private static int COLCOUNT = 17;
-    final private static int INIROWCT = 16;
+    final private static String APPNAME = MyTemplates.XEDTITLE;
+    final private static int AUXSUBCT = MyTemplates.branchCount(APPNAME);
+    final private static int FSIZELIM = 5 * 1024 * 1024; // 5 MB
+    final private static String BYTETEMP = MyTemplates.initXedBytes();
 
     /**
      * Create the GUI and show it.  For thread safety,
@@ -64,49 +46,33 @@ public class HexEditApp {
      */
     private static void createAndShowGUI() {
         //Create and set up the window.
-        JFrame frame = new JFrame(TITLE);
+        JFrame frame = new JFrame(APPNAME);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
 
         JMenuBar menuBar = new JMenuBar();
         JMenu menu;
 
-        for (int i = 0; i < SUBCOUNT; i++) {
-            menu = new JMenu(itemPick(MENUS, i));
+        for (int i = 0; i < AUXSUBCT; i++) {
+            menu = new JMenu(MyTemplates.getMenuName(APPNAME, i));
             menuBar.add(menu);
-            for (int j = 0; j < LENGTHS[i]; j++) {
-                menu.add(new JMenuItem(itemPick(ITEMS[i], j)));
+            for (int j = 0; j < MyTemplates.getMenuLength(APPNAME, i); j++) {
+                menu.add(new JMenuItem(
+                        MyTemplates.getMenuItemName(APPNAME, i, j)));
             }
         }
 
         frame.setJMenuBar(menuBar);
 
-        String[][] defaultBytes = new String[INIROWCT][COLCOUNT];
-        String[] nibbleHeads = new String[COLCOUNT];
+        JEditorPane bytesView = new JEditorPane(
+                "text/html", MyTemplates.initXedBytes());
+        JScrollPane bytesPane = new JScrollPane(bytesView);
+        JEditorPane codesView;
+        JScrollPane codesPane;
+        bytesView.setEditable(false);
+        frame.add(bytesPane);
 
-        for (int i = 0; i < COLCOUNT; i++) {
-            if (i == 0) {
-                nibbleHeads[0] = "";
-            } else {
-                nibbleHeads[i] = xPadAndCap(i - 1);
-            }
-        }
-
-        for (int i = 0; i < INIROWCT; i++) {
-            for (int j = 0; j < COLCOUNT; j++) {
-                defaultBytes[i][j] = j == 0 ? xPadAndCap(i) + "0" : "00";
-            }
-        }
-
-        JTable tableView = new JTable(defaultBytes, nibbleHeads);
-        JScrollPane bytePane = new JScrollPane(tableView);
-        tableView.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
-        tableView.setFillsViewportHeight(true);
-        tableView.setShowGrid(false);
-        tableView.setShowHorizontalLines(false);
-        tableView.setShowVerticalLines(false);
-        frame.getContentPane().add(bytePane);
-
+        
         //Display the window.
         frame.pack();
         frame.setVisible(true);
@@ -120,17 +86,5 @@ public class HexEditApp {
                 createAndShowGUI();
             }
         });
-    }
-
-    public static int itemCount(String csv) {
-        return csv.split(",").length;
-    }
-
-    public static String itemPick(String csv, int index) {
-        return csv.split(",")[index];
-    }
-
-    public static String xPadAndCap(int i) {
-        return (i < 16 ? "0" : "") + Integer.toString(i, 16).toUpperCase();
     }
 }
