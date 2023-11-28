@@ -19,10 +19,10 @@ public class MyTemplates {
                     ",Copy,Paste Write,Paste Insert,Preferences";
     public static final String XEDSUBM3 = "Zoom In,Zoom Out,Encoding";
     public static final String XEDSTYLE = "<style>body {font-family: " +
-            "monospace; background-color: #333333; color: #228800;}table " +
-                    "{border-spacing: 0;}th {background-color: #777777; " +
-                                "color: #dddddd;}td, th {padding: 2px 4px" +
-                                        " 2px 4px;}</style>";
+            "monospace; font-size: 1.1em; background-color: #333333; color: " +
+                    "#228800;}table {border-spacing: 0;}th {background-color" +
+                            ": #777777; color: #dddddd;}td, th {padding: 2px" +
+                                    " 4px 2px 4px;}</style>";
     public static final String OPENXED1 = "<table><thead><tr><th scope=\"col" +
             "\"></th><th scope=\"col\">00</th><th scope=\"col\">01</th><th s" +
                     "cope=\"col\">02</th><th scope=\"col\">03</th><th scope=" +
