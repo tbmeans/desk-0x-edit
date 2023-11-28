@@ -66,10 +66,13 @@ public class HexEditApp {
 
         JEditorPane bytesView = new JEditorPane("text/html", BYTETEMP);
         JScrollPane bytesPane = new JScrollPane(bytesView);
-        JEditorPane codesView;
-        JScrollPane codesPane;
+        JEditorPane codesView = new JEditorPane("text/html", MyTemplates.helloDoc());
+        JScrollPane codesPane = new JScrollPane(codesView);
+        JPanel editorPanel = new JPanel();
         bytesView.setEditable(false);
-        frame.add(bytesPane);
+        editorPanel.add(bytesPane);
+        editorPanel.add(codesPane);
+        frame.add(editorPanel);
 
 
         //Display the window.
