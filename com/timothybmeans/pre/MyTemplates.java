@@ -5,8 +5,9 @@ public class MyTemplates {
     public static final String OPENHTML = "<html lang=\"en\">";
     public static final String OPENHEAD = "<head>" + "<meta charset=\"utf-8" +
             "\"><meta name=\"viewport\" content=\"width=device-width, " + 
-                    "initial-scale=1.0\">" + "<title>";
-    public static final String BEGINBOD = "</head><body>";
+                    "initial-scale=1.0\">";
+    public static final String CLOSHEAD = "</head>";
+    public static final String OPENBODY = "<body>";
     public static final String CLOSEBOD = "</body>";
     public static final String CLOSEHTM = "</html>";
 
@@ -46,7 +47,7 @@ public class MyTemplates {
     }
 
     public static String headTitle(String title) {
-        return title + "</title>";
+        return "<title>" + title + "</title>";
     }
 
     public static String endDocNoScript() {
@@ -54,8 +55,8 @@ public class MyTemplates {
     }
 
     public static String helloDoc() {
-        return (beginDoc() + headTitle("Hello") + BEGINBOD + "Hello world!" +
-            endDocNoScript());
+        return (beginDoc() + headTitle("Hello") + CLOSHEAD + OPENBODY +
+                "Hello world!" + endDocNoScript());
     }
 
     public static int itemCount(String csv) {
@@ -157,8 +158,16 @@ public class MyTemplates {
         return xedLabelRow(lineNum) + data + XEDRWCLS;
     }
 
+    public static String getXedHead() {
+        return (beginDoc() + headTitle(XEDTITLE) + XEDSTYLE + OPENBODY +
+                OPENXEDT);
+    }
+
+    public static String getXedFoot() {
+        return CLOSEXED + endDocNoScript();
+    }
+
     public static String initXedBytes() {
-        return (beginDoc() + headTitle(XEDTITLE) + XEDSTYLE + BEGINBOD + OPENXEDT +
-            xedLabelRow(1) + XEDRWCLS + CLOSEXED + endDocNoScript());
+        return getXedHead() + xedLabelRow(1) + XEDRWCLS + getXedFoot();
     }
 }
